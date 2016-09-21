@@ -1,4 +1,35 @@
+#include <seccomp.h>
+
 #include "runner.h"
+
+static void init_sandbox() {
+    // Syscalls whitelist.
+    static int whitelist[] = {
+        SCMP_SYS(brk),          SCMP_SYS(read),
+        SCMP_SYS(open),         SCMP_SYS(mmap),
+        SCMP_SYS(fstat),        SCMP_SYS(close),
+        SCMP_SYS(access),       SCMP_SYS(munmap),
+        SCMP_SYS(mprotect),     SCMP_SYS(arch_prctl),
+        SCMP_SYS(exit_group),
+    };
+
+    static int whitelist_length = sizeof(syscalls_whitelist) / sizeof(int);
+
+    scmp_filter_ctx ctx = seccomp_init(SCMP_ACT_KILL);
+
+    for (int i = 0; i < whitelist_length; ++i) {
+        seccomp_rule_add(ctx, SCMP_ACT_ALLOW, whitelist[i], 0);
+    }
+
+    // Extra rule for execve.
+    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(execve), 1, SCMP_A0(SCMP_CMP_EQ, (scmp_datum_t)(config->dir)));
+
+    // Only fd 0, 1, 2 are allowed.
+    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(write), 1, SCMP_A0(SCMP_CMP_LE, 2));
+
+    seccomp_load(ctx);
+    seccomp_release(ctx);
+}
 
 // TODO: spawn a child process.
 void spawn() {}
