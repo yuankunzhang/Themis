@@ -9,6 +9,19 @@
 
 #define STACK_SIZE  (2 * 1024 * 1024)
 
+static int set_timer(int sec, int ms, int is_cpu_time) {
+    struct itimerval timerval;
+    timerval.it_interval.tv_sec = timerval.it_interval.tv_usec = 0;
+    timerval.it_value.tv_sec = sec;
+    timerval.it_value.tv_usec = ms * 1000;
+
+    if (setitimer(is_cpu_time ? ITIMER_VIRTUAL : ITIMER_REAL, &timerval, NULL) != 0) {
+        return SETITIMER_FAILED;
+    }
+
+    return EXEC_SUCCESS;
+}
+
 static void init_sandbox() {
     // Syscalls whitelist.
     static int whitelist[] = {

@@ -11,7 +11,7 @@
 #define FORK_FAILED                 1
 #define WAIT4_FAILED                2
 #define EXEC_FAILED                 3
-#define SETTIMER_FAILED             4
+#define SETITIMER_FAILED            4
 #define SETRLIMIT_FAILED            5
 #define DUP2_FAILED                 6
 #define EXCEVE_FAILED               7
