@@ -1,6 +1,13 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <seccomp.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 #include "runner.h"
+
+#define STACK_SIZE  (2 * 1024 * 1024)
 
 static void init_sandbox() {
     // Syscalls whitelist.
@@ -35,4 +42,7 @@ static void init_sandbox() {
 void spawn() {}
 
 // TODO: run the custom program.
-void run() {}
+void run(struct th_config *config, struct th_result *result) {
+    int status;
+    struct rusage resource_usage;
+}
